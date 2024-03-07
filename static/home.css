@@ -1,0 +1,208 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+nav {
+    background-color: #d8ecf9;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #000000;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    transition: background-color 0.3s, padding 0.3s, box-shadow 0.3s;
+    height: 60px;
+}
+
+nav.scrolled {
+    box-shadow: 0 4px 6px rgb(204, 199, 199);
+}
+
+nav h1 {
+    margin: 0;
+    font-size: 30px;
+    color: #000000;
+
+}
+
+nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+nav ul li {
+    margin-right: 30px;
+}
+
+nav a {
+    text-decoration: none;
+    color: #000000;
+    font-weight: bold;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+nav a:hover {
+    color: #9036ff;
+    text-decoration: underline #9036ff solid;
+}
+
+#auth-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+#auth-options a {
+    margin-right: 5px;
+    font-size: 18px;
+    padding: 8px 10px;
+    border-radius: 5px;
+   /* border: #9036ff solid; */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#auth-options a:hover {
+    background-color: #9036ff;
+    color:white;
+    /* font-size: px; */
+}
+
+.menu-icon {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+.menu-icon div {
+    width: 25px;
+    height: 3px;
+    background-color: #0f0e0e;
+    margin: 3px 0;
+}
+
+
+/* signup  signup */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    display: none;
+}
+
+form {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 400px;
+    text-align: center;
+}
+
+h2 {
+    color: #000000;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #585be4;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #9036ff;
+}
+
+#close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 30px;
+    color:white;
+    cursor: pointer;
+}
+
+
+/* login form */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+
+/* signup media qury */
+@media screen and (max-width: 768px) {
+    form {
+        width: 80%;
+    }
+}
+
+
+
+
+
+/* home page media query */
+@media screen and (max-width: 768px) {
+    .menu-icon {
+        display: flex;
+    }
+
+    nav ul {
+        display: none;
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        background-color: #d8ecf9;
+    }
+
+    nav ul.show {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    nav ul li {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+}

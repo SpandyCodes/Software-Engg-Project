@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CollabHub</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #3498db;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 768px) {
+            form {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button onclick="showOverlay('loginForm')">Login</button>
+    <button onclick="showOverlay('signupForm')">Sign Up</button>
+
+    <!-- Login Form Overlay -->
+    <div id="loginFormOverlay" class="overlay">
+        <div id="close-btn" onclick="hideOverlay('loginForm')">X</div>
+        <form>
+            <h2>Login - CollabHub</h2>
+            <input type="email" placeholder="Email">
+            <input type="password" placeholder="Password">
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <!-- Signup Form Overlay -->
+    <div id="signupFormOverlay" class="overlay">
+        <div id="close-btn" onclick="hideOverlay('signupForm')">X</div>
+        <form>
+            <h2>Sign Up - CollabHub</h2>
+            <input type="text" placeholder="Name">
+            <input type="email" placeholder="Email">
+            <input type="password" placeholder="Password">
+            <input type="password" placeholder="Confirm Password">
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+
+    <script>
+        function showOverlay(formId) {
+            document.getElementById(formId + 'Overlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling on background
+        }
+
+        function hideOverlay(formId) {
+            document.getElementById(formId + 'Overlay').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Allow scrolling again
+        }
+    </script>
+
+</body>
+</html>
