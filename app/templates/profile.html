@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="static\profile.css">
+</head>
+
+<body>
+
+    <div class="navbar">
+
+        <div class="user-info">
+            <img src="{{ url_for('static', filename='images/paras.jpeg') }}" alt="User Photo">
+        </div>
+
+
+        
+            <span style="margin-top: 30px; margin-left: 10px;">{{username}}</span>
+
+        <div class="dropdown">
+            <img src="{{ url_for('static', filename='images/menu-bar.png') }}" alt="option">
+
+            <div class="dropdown-content">
+                <a href="#">Settings</a>
+                <a href="/logout">Logout</a>
+            </div>
+
+        </div>
+
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="messages">
+        {% for category, message in messages %}
+        <li class="message {{ category }} show">
+            <span class="close-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+            <div>{{ message }}</div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+
+
+    <table>
+        <tr>
+            <th>Profile</th>
+        </tr>
+        <tr>
+
+            <td class="user-info">
+                <img src="{{ url_for('static', filename='images/paras.jpeg') }}" alt="User Photo"><br>
+
+
+                <div class="personel-info">
+
+                    <div class="name-email">
+                        <strong>
+                            <p>{{username}}</p>
+                            <p>{{email}}</p><br>
+                        </strong>
+                    </div>
+
+                    <div class="info">
+
+                        <div class="home">
+                            <img src="{{ url_for('static', filename='images/home.png') }}" alt="email">
+                            <a href="/home">Home</a>
+                        </div>
+
+                        <div class="email">
+                            <img src="{{ url_for('static', filename='images/email.png') }}" alt="email">
+                            <a href="https://mail.google.com/" target="_blank">Eamil</a>
+                        </div>
+
+                        <div class="create-group">
+                            <img src="{{ url_for('static', filename='images/group.png') }}" alt="email">
+                            <a href="/create_group">Create Group</a>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="button-container">
+                    <a class="button" href="#">Profile</a>
+                    <a class="button" href="#">Password</a>
+                </div>
+
+
+                <div class="logout">
+                    <a href="/logout">Logout</a>
+                </div>
+
+            </td>
+
+
+            <td>
+                <div class="cards">
+
+                    <div class="card">
+                        <h3>My to do List </h3>
+                        <button class="button"> Create New</button>
+                        <button class="button"> See Previous</button>
+                    </div>
+
+
+                    <div class="card">
+                        <h3>My Tasks</h3>
+                        <p>This is the content of card 2.</p>
+                    </div>
+
+
+                    <div class="card">
+                        <h3>My groups</h3>
+                        <p>This is the content of card 3.</p>
+                    </div>
+
+
+                    <div class="card">
+                        <h3>Card 4</h3>
+                        <p>This is the content of card 4.</p>
+                    </div>
+
+                </div>
+
+            </td>
+
+        </tr>
+    </table>
+</body>
+
+</html>

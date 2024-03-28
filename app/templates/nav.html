@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static\nav.css">
+    <title>Contact Page</title>
+   
+</head>
+<body>
+    
+<nav>
+    <a href="home.html" style="text-decoration: none;">
+        <h1>CollabHub</h1>
+    </a>
+    <div class="menu-icon" onclick="toggleMenu()">
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Features</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="{{url_for('contact')}}">Contact</a></li>
+    </ul>
+
+    <div id="auth-options" class="right-side" onclick="toggleMenu()">
+        <ul>
+            <li><a href="#" onclick="showSignupForm()">Sign Up</a></li>
+            <li><a href="#" onclick="showOverlay('loginForm')">Login</a></li>
+        </ul>
+    </div>
+</nav>
+
+<script>
+        //home page responsiveness
+        window.addEventListener("scroll", function () {
+            var nav = document.querySelector("nav");
+            nav.classList.toggle("scrolled", window.scrollY > 0);
+        });
+
+        function toggleMenu() {
+            var menu = document.querySelector("nav ul");
+            menu.classList.toggle("show");
+        }
+</script>
+</body>
+</html>

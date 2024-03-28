@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CollabHub</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"
+        type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- linking csss -->
+    <link rel="stylesheet" href="static\home.css">
+    <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+        integrity="sha512-DIk/eYXAs5FADTLjmABv1BJ/BIZmowvpQ98aAFpuSlZwSck4kBOJ03tm1YINRaxorjBRMviWzrz5tQqr58zvlA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+
+</head>
+
+<body>
+
+
+    <nav>
+        <a href="home.html" style="text-decoration: none;">
+            <!-- <img src="{{ url_for('static', filename='images/logo.png') }}"  alt="Your Logo" style="width: 100px; height: auto;"> -->
+            <h1>CollabHub</h1>
+        </a>
+        <div class="menu-icon" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Features</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="{{url_for('contact')}}">Contact</a></li>
+        </ul>
+
+        <div id="auth-options" class="right-side" onclick="toggleMenu()">
+            <ul>
+                <li><a href="#" onclick="showSignupForm()">Sign Up</a></li>
+                <li><a href="#" onclick="showOverlay('loginForm')">Login</a></li>
+            </ul>
+        </div>
+    </nav>
+
+
+    <div class="holder">
+        <img class="standardImg" src="{{ url_for('static', filename='images/background.png') }}" alt="Background">
+    </div>
+
+    {% if logout_message %}
+    <div class="flash-message {{ logout_message.category }}">
+        {{ logout_message.message }}
+    </div>
+    {% endif %}
+
+
+
+
+
+
+
+    <!-- signup code -->
+    <div id="overlay">
+        <div id="close-btn" onclick="hideSignupForm()">X</div>
+        <form action="{{ url_for('register')}}" method="post" autocomplete="on">
+            <h2>Sign Up - CollabHub</h2>
+            <input type="text" name="name" placeholder="Name" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+            <button type="submit">Sign Up</button>
+            <!-- <a href=""></a> -->
+        </form>
+    </div>
+
+
+    <!-- login form -->
+    <div id="loginFormOverlay" class="overlay">
+        <div id="close-btn" onclick="hideOverlay('loginForm')">X</div>
+        <form action="{{ url_for('login')}}" method="post" autocomplete="off">
+            <h2>Login - CollabHub</h2>
+            <input type="email" placeholder="Email" name="email" required>
+            <input type="password" placeholder="Password" name="password" required>
+            <button type="submit">Login</button>
+            <!-- <a href="" onclick="showSignupForm()">Sign Up</a> -->
+        </form>
+    </div>
+
+    <!-- <iframe style="margin-top: 10%;" src="/render_one" frameborder="0" width="100%" height="500px"></iframe> -->
+
+    <div class="myapp-card-container">
+        <h1 class="myapp-heading">Our Services</h1>
+        <div class="myapp-card">
+            <a href="/login" class="myapp-card-link" style="text-decoration: none;">
+                <img src="{{ url_for('static', filename='images/groupmanagement.png') }}" alt="Group Management">
+                <div class="myapp-card-content">
+                    <h3>Group Management</h3>
+                    <p>Create , Join Group</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="myapp-card">
+            <a href="" class="myapp-card-link" style="text-decoration: none;">
+                <img src="{{ url_for('static', filename='images/todolist.gif') }}" alt="to do list">
+                <div class="myapp-card-content">
+                    <h3>To Do List</h3>
+                    <p>Plan your daily to do list.</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="myapp-card">
+            <a href="" class="myapp-card-link" style="text-decoration: none;">
+                <img src="{{ url_for('static', filename='images/communication.png') }}" alt="Communication">
+                <div class="myapp-card-content">
+                    <h3>Communication</h3>
+                    <p>Chat with your friends , group members</p>
+                </div>
+            </a>
+        </div>
+
+        <div class="myapp-card">
+            <a href="" class="myapp-card-link" style="text-decoration: none;">
+                <img src="{{ url_for('static', filename='images/task.jpg') }}" alt="Tasks">
+                <div class="myapp-card-content">
+                    <h3>Task Management</h3>
+                    <p>AssignTask to Other's , Mark complete task</p>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+<br><br><br><br>
+    <!-- FOTTER -->
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section company-info">
+                <h2>CollabHub</h2>
+                    <p>&copy; 2024 Your CollabHub</p>
+                    <p>Contact: collabhubcustomer9242@gmail.com</p>
+            </div>
+            <div class="footer-section our-services">
+                <h2>Navigate</h2>
+                <ul class="menu" >
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Sign Up</a></li>
+                    <li><a href="#">Login</a></li>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+                
+            </div>
+            <div class="footer-section social-links">
+                <h2>Follow Us</h2>
+                <div class="social-icons">
+                    <a href="#"><img src="{{ url_for('static', filename='images/meta.png') }}" alt="">Facebook</a>
+                    <a href="#"><img src="{{ url_for('static', filename='images/instagram.png') }}" alt="">Instagram</a>
+                    <a href="#"><img src="{{ url_for('static', filename='images/twitter.png') }}" alt="">Twitter</a>
+                   
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <script>
+        //home page responsiveness
+        window.addEventListener("scroll", function () {
+            var nav = document.querySelector("nav");
+            nav.classList.toggle("scrolled", window.scrollY > 0);
+        });
+
+        function toggleMenu() {
+            var menu = document.querySelector("nav ul");
+            menu.classList.toggle("show");
+        }
+
+
+        // signup functionality
+        function showSignupForm() {
+            document.getElementById('overlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling on background
+        }
+
+        function hideSignupForm() {
+            document.getElementById('overlay').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Allow scrolling again
+        }
+
+
+        // login function
+        function showOverlay(formId) {
+            document.getElementById(formId + 'Overlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling on background
+        }
+
+        function hideOverlay(formId) {
+            document.getElementById(formId + 'Overlay').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Allow scrolling again
+        }
+
+        // flash msg
+        function removeMessage(element) {
+            // Remove the parent element of the close button (the message container)
+            element.parentNode.remove();
+        }
+
+    </script>
+
+</body>
+
+</html>
