@@ -17,8 +17,9 @@
         </div>
 
 
-        
-            <span style="margin-top: 30px; margin-left: 10px;">{{username}}</span>
+        <span style="margin-top: 30px; margin-left: 10px;">{{username}}</span>
+       
+
 
         <div class="dropdown">
             <img src="{{ url_for('static', filename='images/menu-bar.png') }}" alt="option">
@@ -82,6 +83,12 @@
                             <img src="{{ url_for('static', filename='images/group.png') }}" alt="email">
                             <a href="/create_group">Create Group</a>
                         </div>
+
+                        <div class="create-group">
+                            <img src="{{ url_for('static', filename='images/contact-me.png') }}" alt="email">
+                            <a href="/contact">Contact Us</a>
+                        </div>
+
                     </div>
 
                 </div>
@@ -105,8 +112,8 @@
 
                     <div class="card">
                         <h3>My to do List </h3>
-                        <button class="button"> Create New</button>
-                        <button class="button"> See Previous</button>
+                        <button class="button"><a href="/todo" style="color: white; text-decoration: none;">Create New</a></button>
+                        <button class="button"><a href="/previous_lists" style="color: white; text-decoration: none;">See Previous</a></button>
                     </div>
 
 
@@ -118,7 +125,7 @@
 
                     <div class="card">
                         <h3>My groups</h3>
-                        <p>This is the content of card 3.</p>
+                        <button class="button"> See Groups</button>
                     </div>
 
 
