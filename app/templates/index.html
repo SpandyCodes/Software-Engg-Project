@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>To-Do List <img src="{{ url_for('static', filename='images/icon.png') }}" alt="icon"></h2>
+        <form action="{{ url_for('todo') }}" method="post">
+            <input type="text" name="task" placeholder="Add Your To do List" required>
+
+            <div class="button">
+                <button type="submit">Add</button>
+                <button type="submit"><a href="{{ url_for('profile') }}" style="color: white; text-decoration: none;">Go Back</a></button>
+            </div>
+
+        </form>
+    </div>
+</body>
+
+</html>
