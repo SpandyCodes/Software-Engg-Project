@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import pymysql
-from app import mysql
+from flask_mail import Mail, Message
+from app import mysql,mail
 import MySQLdb.cursors
 import os
 import bcrypt
@@ -8,10 +9,16 @@ import re  # Import the bcrypt library
 from app import app
 from app.utils import get_db_connection
 from datetime import date
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 
 
 # Bcrypt configuration
 bcrypt_salt_rounds = 12
+
+
 
 
 # home page route
@@ -22,6 +29,8 @@ def home():
     if 'message' in session:
         logout_message = session.pop('message')  # Retrieve flashed message
     return render_template('home.html', logout_message=logout_message)
+
+
 
 
 @app.route('/paras')
@@ -55,7 +64,7 @@ def register():
 
                 # Validate email format
                 elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-                    flash('Invalid email address!', 'error',category='email')  # Add category for styling
+                    flash('Invalid email address!', 'error',category='email') 
                     return render_template('home.html')
 
                 # Validate name format
@@ -90,6 +99,9 @@ def register():
     return render_template('home.html')
 
 
+
+
+
 # login route
 def verify_password(stored_password, provided_password):
     stored_password_bytes = stored_password.encode('utf-8') if isinstance(stored_password, str) else stored_password
@@ -122,13 +134,14 @@ def login():
                 else:
                     # Failed login
                     flash('Invalid email or password. Please try again.', 'error')
-                    return redirect(url_for('login'))
+                    return redirect(url_for('home'))
 
         else:
             flash("Failed to establish database connection", "error")
             return redirect(url_for('login'))
 
-    return render_template('login.html')
+    return render_template('home.html')
+
 
 
 
@@ -145,7 +158,10 @@ def profile():
     else:
         # If user is not logged in, redirect to login page
         flash('Please login to access your profile.', 'error')
-        return redirect(url_for('login'))
+        return redirect(url_for('home'))
+    
+    
+
 
 
 
@@ -160,13 +176,20 @@ def logout():
 
 
 
+
+
 # creategroup route 
 @app.route('/create_group', methods=['POST','GET'])
 def create_group():
+
+    if 'user_id' not in session:
+        flash("You need to log in to create a group.", 'error')
+        return redirect(url_for('create_group'))
+
     if request.method == 'POST':
         name=request.form['name']
         email = request.form['email']
-        admin=request.form['admin']
+        admin_name=request.form['admin']
         creation_date = date.today().strftime('%Y-%m-%d')  # Get current date in YYYY-MM-DD format
 
 
@@ -177,24 +200,33 @@ def create_group():
                 cursor.execute("SELECT * FROM User WHERE email = %s", (email,))
                 user = cursor.fetchone()
 
+                cursor.execute("SELECT group_id FROM grp WHERE name = %s AND admin_name = %s", (name, admin_name))
+                existing_group = cursor.fetchone()
+
+                if existing_group:
+                    con.close()
+                    flash("Group with the same name and admin already exists.",'error')
+                    return redirect(url_for('create_group'))
+
                 if user:
-                    cursor.execute("INSERT INTO grp (name, admin, creation_date) VALUES (%s, %s, DATE('now'))", (name, admin))
+                    cursor.execute("INSERT INTO grp (name, admin_name, creation_date) VALUES (%s, %s, %s)", (name,admin_name, creation_date))
                     con.commit()
                     con.close()
-                    return render_template('home.html')
+                    flash("Group is Created",'success')
+                    return redirect(url_for('profile'))
 
                 elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-                    flash('Invalid email address!', 'error',category='email')  # Add category for styling
-                    return render_template('creategrp.html')
+                    flash('Invalid email address!', 'error')  # Add category for styling
+                    return redirect(url_for('/create_group'))
 
                 else:
-                    conn.close()
-                    flash("Admin not registered")
-                    return render_template('create_group.html')
+                    con.close()
+                    flash("Admin not registered",'error')
+                    return redirect(url_for('create_group'))
         else:
             conn.close()
-            flash("Admin not registered")
-            return render_template('create_group.html')
+            flash("Admin not registered",'error')
+            return redirect(url_for('create_group'))
 
     return render_template('creategrp.html')
 
@@ -206,14 +238,134 @@ def create_group():
 
 
 
-
-@app.route('/contact')
+#CONTACT ROUTE
+@app.route('/contact', methods=['POST', 'GET'])
 def contact():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        message = request.form.get('message')
+
+        if not (name and email and message):
+            flash('Please fill in all fields.', 'error')
+            return redirect(request.url)
+
+        msg = Message(subject='Contact Form Submission',
+                      sender=email,
+                      recipients=['bhosaleparas030@gmail.com'],  # Your email address
+                      body=f'Name: {name}\nEmail: {email}\nMessage: {message}')
+
+        try:
+            mail.send(msg)
+            flash('Your message has been sent successfully.', 'success')
+        except Exception as e:
+            flash(f'An error occurred while sending your message: {str(e)}', 'error')
+
+        return redirect(url_for('profile'))
+
+    # If the request method is GET, render the contact form template
     return render_template('contact.html')
 
-@app.route('/one')
-def one():
-    return render_template('nav.html')
 
 
-  
+
+
+#to do list
+@app.route('/todo', methods=['POST','GET'])
+def todo():
+    user_name = session['username']
+    task=None
+    if request.method == 'POST':
+        task = request.form['task']  # Get the task from the form
+
+        con = get_db_connection()
+
+        if con:
+            cursor = con.cursor()
+            # Insert the user's name and to-do list into the database
+            insert_query = "INSERT INTO todo (user_name, todo_list) VALUES (%s, %s)"
+            cursor.execute(insert_query, (user_name, task))
+            con.commit()
+            con.close()
+            flash("To do List stored Successfully")
+            return redirect(url_for('profile'))
+
+        else:
+            flash('Database connection failed', 500)
+            return redirect(url_for('profile'))
+
+    return render_template('index.html')
+
+
+    
+
+ # SEE PRVIOUS LIST
+@app.route('/previous_lists', methods=['GET'])
+def previous_lists():
+    user_name = session.get('username')
+    user_email = session.get('email')  # Assuming you store user's email in session
+
+    if not user_name:
+        flash('User not logged in', 'error')
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+
+    if con:
+        cursor = con.cursor()
+
+        # Retrieve previous to-do lists from the database
+        select_query = "SELECT todo_list FROM todo WHERE user_name = %s"
+        cursor.execute(select_query, (user_name,))
+        previous_lists = cursor.fetchall()
+        print(previous_lists)
+
+        con.close()
+
+        # Send email notification with previous to-do lists
+        if previous_lists:
+            todo_message = "\n".join(f"- {todo['todo_list']}" for todo in previous_lists)
+            send_todo_list_email(user_email, user_name, todo_message)
+
+        # Render HTML template and pass previous lists data to it
+        return render_template('previous_lists.html', previous_lists=previous_lists, username=user_name)
+    else:
+        flash('Database connection failed', 'error')
+        return redirect(url_for('profile'))
+
+def send_todo_list_email(recipient_email, username, todo_message):
+    try:
+        msg = Message(subject='Your Previous To-Do Lists',
+                      sender='your_email@example.com',  # Your email address
+                      recipients=[recipient_email],
+                      body=f'Hello {username},\n\nHere are your previous to-do lists:\n\n{todo_message}\n\nBest regards,\nYour Application Team')
+
+        mail.send(msg)
+        flash('Email notification sent successfully', 'success')
+    except Exception as e:
+        flash(f'An error occurred while sending email notification: {str(e)}', 'error')
+
+
+# DELETE TO DO LIST TASK
+@app.route('/complete_task/<task>', methods=['GET'])
+def complete_task(task):
+    user_name = session.get('username')
+    if not user_name:
+        flash("User not logged in", 'error')
+        return redirect(url_for('login'))
+
+    con = get_db_connection()
+    if con:
+        try:
+            cursor = con.cursor()
+            cursor.execute("DELETE FROM todo WHERE user_name = %s AND todo_list = %s", (user_name, task))
+            con.commit()
+            con.close()
+            flash("Task completed successfully",'success')
+            return redirect(url_for('previous_lists'))
+        except Exception as e:
+            flash("An error occurred while completing the task", 'error')
+    else:
+        flash("Database connection failed", 'error')
+
+    return redirect(url_for('previous_lists'))
