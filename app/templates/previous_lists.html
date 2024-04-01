@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previous To-Do</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='seeprev.css') }}">
+</head>
+
+<body>
+    <img src="{{ url_for('static', filename='images/todolistback.jpg') }}" alt="Background Image"
+        class="background-image">
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="messages">
+            {% for category, message in messages %}
+            <li class="message {{ category }} show">
+                <span class="close-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+                <div>{{ message }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+
+    <div class="container">
+        <h2>{{username}} To-Do Lists</h2>
+
+        <ul>
+            {% for todo_list in previous_lists %}
+            {% if todo_list['todo_list'] %}
+            <li>{{ todo_list['todo_list'] }}
+                <a href="{{ url_for('complete_task', task=todo_list['todo_list']) }}">Complete</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+
+</html>
