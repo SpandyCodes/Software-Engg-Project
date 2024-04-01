@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,10 +62,83 @@
             background-color: #e8c586;
             color: #77037B;
         }
+
+
+        ul.messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        li.message {
+            position: relative;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, margin-left 0.5s ease-in-out;
+            margin-left: -100%;
+            /* Start off-screen */
+            text-align: center;
+        }
+
+        li.message.show {
+            margin-left: 0;
+            /* Slide in from the left */
+        }
+
+        li.message:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .message.error {
+            border: 1px solid #E74C3C;
+            background-color: #f55f48;
+            color: white;
+        }
+
+        .message.success {
+            border: 1px solid #02f467;
+            background-color: #62f3a3;
+            color: black;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+        }
     </style>
 </head>
+
 <body>
+
+
+
+
+
     <div class="container">
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class="messages">
+            {% for category, message in messages %}
+            <li class="message {{ category }} show">
+                <span class="close-btn" onclick="this.parentElement.style.display='none'">&times;</span>
+                <div>{{ message }}</div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+
+
         <h1>Create a New Group</h1>
         <form method="POST">
             <label for="name">Group Name:</label>
@@ -80,4 +154,5 @@
         </form>
     </div>
 </body>
+
 </html>
