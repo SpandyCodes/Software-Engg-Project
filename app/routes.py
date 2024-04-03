@@ -369,3 +369,4 @@ def complete_task(task):
         flash("Database connection failed", 'error')
 
     return redirect(url_for('previous_lists'))
+    
