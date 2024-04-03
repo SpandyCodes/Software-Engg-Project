@@ -13,6 +13,10 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+from werkzeug.utils import secure_filename
+
+filename = "my&file.txt"
+secure_filename(filename)  # Returns: "my_file.txt"
 
 
 # Bcrypt configuration
@@ -162,6 +166,99 @@ def profile():
     
     
 
+# Define allowed file extensions for photo upload
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+
+
+
+# Function to check if file extension is allowed
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+
+
+# Function to hash the password
+def hash_password(password):
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    return hashed_password.decode('utf-8')  # Decode bytes to string for storage in the database
+
+
+
+@app.route('/update_profile', methods=['POST','GET'])
+def update_profile():
+    username = session['username']
+    email=session['email']
+
+    if request.method == 'POST':
+        # Get form data
+        name = request.form['name']
+        email = request.form['email']
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
+        dob = request.form['dob']
+        skills = request.form['skills']
+        photo = request.files['photo']
+
+
+        if not name or not email:
+             # Validate form data
+            flash("Name and email are required fields.", 'error')
+            return redirect(url_for('profile'))
+
+
+# Password validation
+        if password:
+            if password != confirm_password:
+                flash("Passwords do not match.", 'error')
+                return redirect(url_for('profile'))
+
+
+        # Update user profile in the database
+        con = get_db_connection()
+        if con:
+            with con.cursor() as cursor:
+                # Update the user's name and email
+                cursor.execute("UPDATE user SET name = %s, email = %s WHERE name = %s", (name, email, username))
+
+                # Update password if provided
+                if password:
+                    hashed_password = hash_password(password)
+                    cursor.execute("UPDATE user SET password = %s WHERE name = %s", (hashed_password, username))
+
+                # Update date of birth
+                if dob:
+                    cursor.execute("UPDATE user SET dob = %s WHERE name = %s", (dob, username))
+
+
+            # Update skills
+                if skills:
+                    cursor.execute("UPDATE user SET skills = %s WHERE name = %s", (skills, username))
+                
+
+                # Handle photo upload
+                if photo and allowed_file(photo.filename):
+                    filename = secure_filename(photo.filename)
+                    # photo_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    # photo.save(photo_path)
+                    cursor.execute("UPDATE user SET photo_path = %s WHERE name = %s", (photo_path, username))
+
+                    cursor.execute("UPDATE config SET upload_folder = %s WHERE id = 1", (app.config['UPLOAD_FOLDER'],))
+
+
+                   
+                con.commit()
+                flash("Profile updated successfully.", 'success')
+                con.close()
+                return redirect(url_for('profile'))
+
+        else:
+            flash("Database connection error", 'error') 
+    
+    return render_template('update_profile.html',username=username,email=email)
+                     
+                
 
 
 
@@ -187,11 +284,10 @@ def create_group():
         return redirect(url_for('create_group'))
 
     if request.method == 'POST':
-        name=request.form['name']
+        name = request.form['name']
         email = request.form['email']
-        admin_name=request.form['admin']
+        admin_name = request.form['admin']
         creation_date = date.today().strftime('%Y-%m-%d')  # Get current date in YYYY-MM-DD format
-
 
         con = get_db_connection()
 
@@ -209,10 +305,22 @@ def create_group():
                     return redirect(url_for('create_group'))
 
                 if user:
-                    cursor.execute("INSERT INTO grp (name, admin_name, creation_date) VALUES (%s, %s, %s)", (name,admin_name, creation_date))
+                    # Insert new group into grp table
+                    cursor.execute("INSERT INTO grp (name, admin_name, creation_date) VALUES (%s, %s, %s)",
+                                   (name, admin_name, creation_date))
                     con.commit()
+
+                    # # Get the group ID of the newly created group
+                    # cursor.execute("SELECT LAST_INSERT_ID()")
+                    # group_id = cursor.fetchone()[0]
+
+                    # Insert admin into groupmember table
+                    cursor.execute("INSERT INTO groupmember (group_name, username) VALUES (%s, %s)",
+                                   (name, admin_name))
+                    con.commit()
+
                     con.close()
-                    flash("Group is Created",'success')
+                    flash("Group is Created", 'success')
                     return redirect(url_for('profile'))
 
                 elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
@@ -370,3 +478,28 @@ def complete_task(task):
 
     return redirect(url_for('previous_lists'))
     
+
+
+
+
+# showing my groups
+@app.route('/my_groups')
+def my_groups():
+    if 'username' not in session:
+        flash("You need to log in to view your groups.", 'error')
+        return redirect(url_for('login'))
+
+    username = session['username']
+
+    con = get_db_connection()
+
+    if con:
+        with con.cursor() as cursor:
+            cursor.execute("SELECT group_name FROM groupmember WHERE username = %s", (username,))
+            groups = cursor.fetchall()
+            groups = [group['group_name'] for group in groups]  
+            con.close()
+            return render_template('test1.html', groups=groups)
+    else:
+        flash("Database connection error", 'error')
+        return redirect(url_for('profile'))
