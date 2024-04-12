@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            /* justify-content: center; */
+            flex-direction: column;
+            width: 100%;
+            min-height: 100vh;
+        }
+
+        .chat-area {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            margin-top: 5%;
+            margin-left: 5%;
+            margin-right: 5%;
+
+            width: 90%;
+            border: #77037B;
+            box-shadow: rgb(115, 52, 117) 0px 3px 8px;
+            height: 100vh;
+        }
+
+        .group_name {
+            background-color: #77037B;
+            height: 50px;
+            padding: 10px 15px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .group_name h2 {
+            margin: 0;
+        }
+
+        /* #messages {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            overflow-y: auto;
+            max-height: 300px;
+        } */
+
+        .message-input {
+            display: flex;
+            justify-content: space-between;
+            flex-direction: row;
+            /* margin-top: 5%; */
+            margin: auto;
+        }
+
+
+        input[type="text"],
+        button {
+            padding: 10px;
+            margin-bottom: 10px;
+            width: calc(100% - 20px);
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+
+
+        button {
+            background-color: #77037B;
+            width: 100px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            padding: 8px 15px;
+        }
+
+        button:hover {
+            background-color: #c25fc6;
+        }
+
+        .message-input input[type='text'] {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <script type="text/javascript">
+        // var username = "{{ username }}"; // Use Flask variable here
+        // var group = "{{group}}"
+
+
+        $(document).ready(function () {
+            var socket = io.connect("http://localhost:5000")
+            var username = localStorage.getItem('username');
+
+
+            var username = localStorage.getItem('username');
+            var tabId = localStorage.getItem('tabId');
+
+            // Generate a unique tabId if it doesn't exist
+            if (!tabId) {
+                tabId = 'tab-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('tabId', tabId);
+            }
+
+
+            // //////
+
+            // Function to request previous messages from the server
+            function getPreviousMessages() {
+                // Send a request to the server to get previous messages
+                socket.emit('get_previous_messages');
+            }
+
+            // Function to handle receiving previous messages from the server
+            socket.on('previous_messages', function (previousMessages) {
+                // Append each previous message to the chat area
+                previousMessages.forEach(function (message) {
+                    $('#messages').append($('<p>').text(message));
+                });
+            });
+
+        
+            // Emit username and tabId to the server
+            socket.emit('join', { username: username, tabId: tabId });
+
+            socket.on('message', function (data) {
+                $('#messages').append($('<p>').text(data));
+            });
+
+            $('#sendBtn').on('click', function () {
+                // var username = $('#username').val();
+                // Retrieve the username and group from the server
+                var username = getUsername();
+                // var group = getGroup();
+
+                var message = $('#message').val();
+                var group = $('#group').val();
+
+                var timestamp = new Date().toLocaleString(); // Get current timestamp
+
+                // Construct the message with username, timestamp, and message content
+                var fullMessage = username + ' (' + timestamp + '): ' + message;
+
+                socket.send(fullMessage);
+                socket.send(group)
+
+
+                $('#message').val('');
+            });
+
+
+            $(window).on('beforeunload', function () {
+                localStorage.removeItem('tabId'); // Remove tabId on page unload
+            });
+
+
+        });
+
+        // Function to retrieve the username from the server
+        function getUsername() {
+            // Send a request to the server to get the username
+            var username;
+            $.ajax({
+                url: '/get_username',
+                type: 'GET',
+                async: false, // Make the request synchronous
+                success: function (data) {
+                    username = data.username;
+                }
+            });
+            return username;
+        }
+    </script>
+
+    <div class="container">
+
+        <div class="group_name">
+            <h1 id="group">{{group}}</h1>
+        </div>
+
+
+        <div id="messages" class="chat-area">
+
+        </div>
+
+        <br><br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+
+
+
+
+        <div class="meassage-input">
+
+            <!-- <input type="text" id="username" value="{{username}}" readonly> -->
+            <input type="text" id="message" placeholder="Message">
+            <button id="sendBtn">Send</button>
+
+        </div>
+
+    </div>
+
+
+
+</body>
+
+</html>
