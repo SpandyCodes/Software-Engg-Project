@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Members</title>
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 250px;
+            background-color: #77037B;
+            color: #fff;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            margin: 0 0 20px;
+            font-size: 20px;
+        }
+
+        #group-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #group-list li {
+            padding: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #group-list li:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        #add-member-button,
+        #see-member-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #77037B;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        #add-member-button:hover,
+        #see-member-button:hover {
+            background-color: #BC7FCD;
+        }
+
+        .sidebar img {
+            width: 30px;
+            height: 30px;
+        }
+
+        /* Table styles */
+        .table {
+            flex: 1;
+            padding: 20px;
+        }
+
+        h1 {
+            background-color: #77037B;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            margin: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #BC7FCD;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        button a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        button {
+            background-color: #77037B;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #BC7FCD;
+        }
+
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-top: 1px solid #ccc;
+        }
+
+        #message-input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+
+        #send-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #77037B;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        #send-button:hover {
+            background-color: #BC7FCD;
+        }
+
+        /* Form popup styles */
+        .form-popup {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            border: 1px solid #ccc;
+            z-index: 999;
+            background-color: #fff;
+            padding: 20px;
+            max-width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .form-popup h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .form-popup input[type="text"],
+        .form-popup input[type="email"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .form-popup button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #77037B;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+
+        .form-popup button:hover {
+            background-color: #BC7FCD;
+        }
+
+        /* Flash message styles */
+        ul.messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 999;
+        }
+
+        li.message {
+            position: relative;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: #02f467;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, margin-left 0.5s ease-in-out;
+            margin-left: -100%;
+            /* Start off-screen */
+            text-align: center;
+            max-width: 300px;
+        }
+
+        li.message.show {
+            margin-left: 0;
+            /* Slide in from the left */
+        }
+
+        li.message:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .message.error {
+            border: 1px solid #E74C3C;
+            background-color: #f55f48;
+            color: white;
+        }
+
+        .message.success {
+            border: 1px solid #02f467;
+            background-color: #62f3a3;
+            color: black;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.3s ease-in-out;
+            color: #fff;
+        }
+
+        .close-btn:hover {
+            color: #333;
+            /* Darken the color on hover */
+        }
+
+        .button {
+            margin-top: 10px;
+        }
+
+        .user img {
+            height: 30px;
+            width: 30px;
+            margin-top: 10px;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+            }
+        }
+
+        .button-task:hover {
+            background-color: #77037B;
+        }
+
+        .add-member-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .add-member-container img {
+            margin-top: 20px;
+            height: 30px;
+            width: 30px;
+            /* Adjust as needed */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #fff;
+            border-radius: 5px;
+            background-color: #BC7FCD;
+            color: #fff;
+            font-size: 16px;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        select option[disabled] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="sidebar">
+
+            <div class="user">
+                <img src="{{ url_for('static', filename='images/user.png') }}" alt="">
+                <h2> {{username}}</h2>
+            </div>
+
+            <label for="group-select">My Groups:</label>
+            <select id="group-select" onchange="location = this.value;">
+                <option value="#" selected disabled>See Groups</option>
+                {% for group in groups %}
+                <option >{{ group }}</option>
+                {% endfor %}
+            </select>
+            <!-- value="{{ url_for('my_groups', group_name=group) }}" -->
+
+
+            <br>
+            <div class="add-member-container">
+                <img src="{{ url_for('static', filename='images/add-friend.png') }}" alt="">
+                <!-- Image before button -->
+                <button id="add-member-button">Add Member</button>
+            </div>
+
+            <div class="add-member-container">
+                <img src="{{ url_for('static', filename='images/vision.png') }}" alt=""> <!-- Image before button -->
+                <button id="see-member-button">See Member</button>
+            </div>
+
+            <div class="add-member-container">
+                <img src="{{ url_for('static', filename='images/delegation.png') }}" alt=""> <!-- Image before button -->
+                <button id="see-member-button"><a href="{{ url_for('assign_task', group_name=group) }}"
+                    style="text-decoration: none; color: #fff;">Manage Task</a></button>
+            </div>
+
+            <div class="add-member-container">
+                <img src="{{ url_for('static', filename='images/exam.png') }}" alt=""> <!-- Image before button -->
+                <button id="see-member-button"> <a href="" style="text-decoration: none; color: #fff;">Task
+                        History</a></button>
+            </div>
+
+            <div class="add-member-container">
+                <img src="{{ url_for('static', filename='images/user_use.png') }}" alt=""> <!-- Image before button -->
+                <button id="see-member-button"><a href="/profile" style="text-decoration: none; color: white;">Profile</a></button>
+            </div>
+
+            <div class="add-member-container">
+                <img src="{{ url_for('static', filename='images/home.png') }}" alt=""> <!-- Image before button -->
+                <button id="see-member-button"><a href="/home" style="text-decoration: none; color: white;">Home</a></button>
+            </div>
+
+        </div>
+
+
+        <div class="table">
+            <h1>Group Members - {{ group_name }}</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sr No</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in members %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ member['username'] }}</td>
+                        <td>{{ member['email'] }}</td>
+                        <td><button><a href="/assign_task">Add Task</a></button></td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- Form for adding a new member -->
+        <div class="form-popup" id="add-member-form">
+            <form id="add-member-form-inner" action="/add_member" method="post">
+                <h2>Add Member</h2>
+                <input type="text" id="group-name-input" name="group_name" placeholder="Group Name" required>
+                <input type="text" id="username-input" name="username" placeholder="Username" required>
+                <input type="email" id="email-input" name="email" placeholder="Email" required>
+                <button class="button" type="submit">Add</button>
+                <br>
+                <button type="button" id="close-form-button" class="button">Close</button>
+
+            </form>
+        </div>
+
+
+        <!-- Seee group members -->
+
+        <div class="form-popup" id="view-members-form">
+            <form id="view-members-form-inner" action="/view_members" method="post">
+                <h2>View Group Members</h2>
+                <input type="text" id="group-name-input" name="group_name" placeholder="Group Name" required>
+                <button class="button" type="submit">Show</button>
+                <br>
+                <button type="button" id="close-button" class="button">Close</button>
+            </form>
+        </div>
+
+
+
+
+        <!-- to addd members -->
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Add event listener for showing the add member form
+                document.getElementById('add-member-button').addEventListener('click', function () {
+                    document.getElementById('add-member-form').style.display = 'block';
+                });
+
+                // Add event listener for closing the add member form
+                document.getElementById('close-form-button').addEventListener('click', function () {
+                    document.getElementById('add-member-form').style.display = 'none';
+                });
+            });
+
+        </script>
+
+
+
+        <!-- Seee group members -->
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Add event listener for showing the see member form
+                document.getElementById('see-member-button').addEventListener('click', function () {
+                    document.getElementById('view-members-form').style.display = 'block';
+                });
+
+                // Add event listener for closing the see member form
+                document.getElementById('close-button').addEventListener('click', function () {
+                    document.getElementById('view-members-form-inner').style.display = 'none';
+                });
+            });
+
+        </script>
+
+    </div>
+
+</body>
+
+</html>
